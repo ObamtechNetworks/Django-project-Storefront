@@ -17,8 +17,9 @@ class Collection(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField()
     description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)  # do not delete all products in collection
@@ -43,6 +44,13 @@ class Customer(models.Model):
     phone = models.CharField(max_length=255)
     birth_date = models.DateField(null=True)
     membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+    
+    # define meta data about this model
+    # class Meta:
+    #     db_table = 'store_customers'
+    #     indexes = [
+    #         models.Index(fields=['last_name', 'first_name'])
+    #     ]
 
 
 class Order(models.Model):
@@ -72,6 +80,7 @@ class OrderItem(models.Model):
 class Address(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
+    zip = models.CharField(max_length=255, null=True)  #optional
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     # customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)  # primary key implies only one address for the customer
 
