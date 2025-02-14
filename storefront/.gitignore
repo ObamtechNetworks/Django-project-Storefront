@@ -5,3 +5,5 @@
 *.secret
 *.key
 .python-version
+
+.vscode
