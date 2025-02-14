@@ -1,0 +1,7 @@
+# Ignore environment variables
+.env
+
+# Ignore other sensitive files
+*.secret
+*.key
+.python-version
