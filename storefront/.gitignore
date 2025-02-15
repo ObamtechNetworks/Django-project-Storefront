@@ -1,9 +1,4 @@
-# Ignore environment variables
+__pycache__/
+*.pyc
 .env
-
-# Ignore other sensitive files
-*.secret
-*.key
-.python-version
-
-.vscode
+.secret
