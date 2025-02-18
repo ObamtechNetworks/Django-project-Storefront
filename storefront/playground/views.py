@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F
-from store.models import Product, OrderItem
+from django.db.models.aggregates import Count, Max, Min, Avg
+from store.models import Product, OrderItem, Order
 
 
 def say_hello(request):
@@ -68,6 +69,26 @@ def say_hello(request):
     # query_set = Product.objects.filter(orderitem__isnull=False).distinct().order_by('title')
     
     # mosh's solution
-    query_set = Product.objects.filter(id__in=OrderItem.objects.values('product_id').distinct()).order_by('title')
+    # query_set = Product.objects.filter(id__in=OrderItem.objects.values('product_id').distinct()).order_by('title')
     
-    return render(request, 'hello.html', {'name': 'Bamidele', 'products': list(query_set)})
+    # DEFERRING FIELDS
+    # query_set = Product.objects.only('id', 'title') # get instances of the class  -- CAREFUL WITH THIS METHOD, as it can causes too much queries to the db
+    # query_set = Product.objects.defer('description')  # also have to be CAREFUL with this query method
+    
+    # SELECTING RELATED QUERY
+    # using select_related(1)
+    # prefetch_related(n) // many objects
+    # query_set = Product.objects.select_related('collection').all()
+    # query_set = Product.objects.prefetch_related('promotions').all()
+    # query_set = Product.objects.prefetch_related('promotions').select_related('collection').all()
+    
+    # EXERCISE
+    # GET THE LAST 5 ORDERS WITH THEIR CUSTOMER AND ITEMS (INCLUDING PRODUCT)
+    
+    # query_set = Order.objects.select_related('customer').prefetch_related('orderitem_set__product').order_by('-placed_at').all()[:5]
+    
+    # Aggregating objects
+    result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
+    
+    # return render(request, 'hello.html', {'name': 'Bamidele', 'orders': list(query_set)})
+    return render(request, 'hello.html', {'name': 'Bamidele', 'result': result})
