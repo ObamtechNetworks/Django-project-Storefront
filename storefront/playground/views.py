@@ -107,8 +107,13 @@ def say_hello(request):
     
     #  using the Concat Object
     
-    queryset = Customer.objects.annotate(
-        # using the Concat object
-        full_name=Concat('first_name', Value(' '), 'last_name')  # research more django database functions
-    )
+    # queryset = Customer.objects.annotate(
+    #     # using the Concat object
+    #     full_name=Concat('first_name', Value(' '), 'last_name')  # research more django database functions
+    # )
+    
+    # GROUPING DATA
+    # queryset = Customer.objects.annotate(
+    #     orders_count=Count('order')
+    # )
     return render(request, 'hello.html', {'name': 'Bamidele', 'result': list(queryset)})
