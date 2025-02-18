@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F, Value, Func, ExpressionWrapper
 from django.db.models.functions import Concat
 from django.db.models.aggregates import Count, Max, Min, Avg
-from store.models import Product, OrderItem, Order, Customer
+from store.models import Product, OrderItem, Order, Customer, Collection
 from django.contrib.contenttypes.models import ContentType
 from tags.models import TaggedItem
 
@@ -125,13 +125,30 @@ def say_hello(request):
     # queryset = Product.objects.annotate(discounted_price=discounted_price)
     
     # QUERYING GENERIC RELATIONSHIPS
-    content_type = ContentType.objects.get_for_model(Product) # returns a content type instance
+    # content_type = ContentType.objects.get_for_model(Product) # returns a content type instance
     
-    queryset = TaggedItem.objects\
-        .select_related('tag')\
-        .filter(
-        content_type=content_type,
-        object_id=1
-    )
+    # queryset = TaggedItem.objects\
+    #     .select_related('tag')\
+    #     .filter(
+    #     content_type=content_type,
+    #     object_id=1
+    # )
     
-    return render(request, 'hello.html', {'name': 'Bamidele', 'orders': list(queryset)})
+    # # BUIDLING CUSTOM MANAGER
+    # queryset = TaggedItem.objects.get_tags_for(Product, 1)
+    
+    # creating objects (individual creations or using keyword arguments) keyword arguments have some issues with attributesvhsnhr
+    collection = Collection()
+    collection.title = 'Video Games'
+    collection.featured_product = Product(pk=1)
+    # collection.featured_product_id = 1 -> works as above
+    collection.save()
+    
+    # using create method to create objects
+    # collection = Collection.objects.create(
+    #     title='a',
+    #     'featured_product_id'=1)
+        
+    
+    
+    return render(request, 'hello.html', {'name': 'Bamidele',})
