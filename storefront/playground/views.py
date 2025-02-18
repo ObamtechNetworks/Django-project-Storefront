@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, F
+from django.db.models import Q, F, Value, Func
+from django.db.models.functions import Concat
 from django.db.models.aggregates import Count, Max, Min, Avg
-from store.models import Product, OrderItem, Order
+from store.models import Product, OrderItem, Order, Customer
 
 
 def say_hello(request):
@@ -88,7 +89,26 @@ def say_hello(request):
     # query_set = Order.objects.select_related('customer').prefetch_related('orderitem_set__product').order_by('-placed_at').all()[:5]
     
     # Aggregating objects
-    result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
+    # result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
+    
+    # Annotating objects -adding additional attributes to objects when querying them
+    # queryset = Customer.objects.annotate(is_new=Value(True))  # receives or expects an expression
+    # queryset = Customer.objects.annotate(new_id=F('id') + 1)  # give customer new Id -- a new field using the F class
+    # receives or expects an expression
+    # expression: value, func, F, Aggregate
     
     # return render(request, 'hello.html', {'name': 'Bamidele', 'orders': list(query_set)})
-    return render(request, 'hello.html', {'name': 'Bamidele', 'result': result})
+    
+    # calling Database Functions
+    # queryset = Customer.objects.annotate(
+    #     # # calling the CONCAT function
+    #     # full_name =Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
+    # )
+    
+    #  using the Concat Object
+    
+    queryset = Customer.objects.annotate(
+        # using the Concat object
+        full_name=Concat('first_name', Value(' '), 'last_name')  # research more django database functions
+    )
+    return render(request, 'hello.html', {'name': 'Bamidele', 'result': list(queryset)})
