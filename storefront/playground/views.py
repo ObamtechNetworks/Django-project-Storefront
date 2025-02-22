@@ -6,6 +6,8 @@ from django.db.models.functions import Concat
 from django.db.models.aggregates import Count, Max, Min, Avg
 from store.models import Product, OrderItem, Order, Customer, Collection
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db import connection
 from tags.models import TaggedItem
 
 
@@ -137,12 +139,12 @@ def say_hello(request):
     # # BUIDLING CUSTOM MANAGER
     # queryset = TaggedItem.objects.get_tags_for(Product, 1)
     
-    # creating objects (individual creations or using keyword arguments) keyword arguments have some issues with attributesvhsnhr
-    collection = Collection()
-    collection.title = 'Video Games'
-    collection.featured_product = Product(pk=1)
-    # collection.featured_product_id = 1 -> works as above
-    collection.save()
+    # CREATING OBJECTS (individual creations or using keyword arguments) keyword arguments have some issues with attributesvhsnhr
+    # collection = Collection()
+    # collection.title = 'Video Games'
+    # collection.featured_product = Product(pk=1)
+    # # collection.featured_product_id = 1 -> works as above
+    # collection.save()
     
     # using create method to create objects
     # collection = Collection.objects.create(
@@ -150,5 +152,54 @@ def say_hello(request):
     #     'featured_product_id'=1)
         
     
+    # UPDATING OBJECTS
+    # collection = Collection(pk=11)
+    # # collection.title = 'Games'  ==> without title, django will set the title field to empty string when not explicitly set
+    # collection.featured_product = None
+    # collection.save()
     
-    return render(request, 'hello.html', {'name': 'Bamidele',})
+    # BEST WAY
+    # collection = Collection.objects.get(pk=11)
+    # # collection.title = 'Games'  ==> without title, django will set the title field to empty string when not explicitly set
+    # collection.featured_product = None
+    # collection.save()
+    
+    # Collection.objects.filter(pk=11).update(featured_product=None)
+    
+    # DELETING OBJECTS
+    # BASIC: 
+    # collections = Collection(pk=11)
+    # collections.delete()
+    
+    # OR
+    # Collection.objects.filter(id__gt=5).delete()  # all collections with id greater than 5
+    
+    # TRANSACTIONS -->django.orm import transaction
+    # @transaction.atomic() can be used as a decorator for a function, wrapping around a function or can be use with a 'with clause'
+    
+    # with transaction.atomic():
+    #     order = Order()
+    #     order.customer_id = 1
+    #     order.save()
+        
+    #     item = OrderItem()
+    #     item.order = order
+    #     item.product_id = -1  # will cause a failure and the query will rollback instead of hanging
+    #     item.quantity = 1
+    #     item.unit_price = 10
+    #     item.save()
+    
+    # EXECUTING RAW SQL QUERIES
+    # queryset_raw = Product.objects.raw('SELECT * FROM store_product')
+    
+    # using the connection object
+    # cursor = connection.cursor()
+    # cursor.execute('')
+    # cursor.close() # needs to close cursor
+    
+    # OR USING WITH CONTEXT MANAGER TO HANDLE CLOSING EASILY
+    # with connection.curspyth
+    
+    
+
+    return render(request, 'hello.html', {'name': 'Bamidele',}) # 'result': list(queryset_raw)})
