@@ -8,10 +8,17 @@ from store.models import Product, OrderItem, Order, Customer, Collection
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db import connection
+from django.http import HttpResponse
 from tags.models import TaggedItem
 
-
+def calculate():
+    x = 1
+    y = 2
+    return x
+    
 def say_hello(request):
+    x = calculate()
+    return render(request, 'hello.html', {'name': 'Bamidele'})
     # products = Product.objects.all() # returns a query_set
     # query_set are lazy and useful for returning complex queries
     
@@ -202,4 +209,4 @@ def say_hello(request):
     
     
 
-    return render(request, 'hello.html', {'name': 'Bamidele',}) # 'result': list(queryset_raw)})
+    #return render(request, 'hello.html', {'name': 'Bamidele',}) # 'result': list(queryset_raw)})
