@@ -23,7 +23,11 @@ class Tag(models.Model):
 
 class TaggedItem(models.Model):
     objects = TaggedItemManager()
+    # what tag applied to what object
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    # know what type of item (product? video? article? whatever)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    # id of the target object (primary key)
     object_id = models.PositiveIntegerField()
+    # getting actual object the tagged item is related to
     content_object = GenericForeignKey()
