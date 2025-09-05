@@ -36,21 +36,26 @@ def say_hello(request):
     # other queries that returns a value and not query_set
     # products.count()
     
+    #====================
+    # RETRIEVING OBJECTS
+    #====================
     # getting all products
     # for product in products:
     #     print(product)
-    
-    # getting a single object
+
+    # Getting a single object / Handling exceptions
     # try:
     #     product = Product.objects.get(pk=0)
     # except ObjectDoesNotExist:
     #     pass
     
-    # more query set that handles exceptions
+    # more query set that handles exceptions with try/except block (using the filter method)
     # product = Product.objects.filter(pk=0).first()
+    # get a boolean value if an object exists or not
     # exists = Product.objects.filter(pk=0).exists()  # returns a boolean
     
-    # more filters
+    # ========= FILTERING IN DETAIL / LOOKUPS ==========
+    # =========================================
     # query_set = Product.objects.filter(unit_price__range=(20, 30)) # using keyword arguments for field lookups double underscore
     # query_set = Product.objects.filter(title__icontains='coffee')  # dealing with strings case insensitive
     # query_set = Product.objects.filter(last_update__year=2021)
@@ -59,13 +64,15 @@ def say_hello(request):
     # query_set = Product.objects.filter(description__isnull=True)  # all products without a description
     # other lookup types __range(min, max), __get=
     
-    # complex queries
+    # ======== COMPLEX FILTERING / CHAINING =======
+    # ==========================================
     # query_set = Product.objects.filter(inventory__lt=10, unit_price__lt=20) another way below
     # query_set = Product.objects.filter(inventory__lt=10).filter(unit_price__lt=20)
     
-    # performing OR operations using Q class
+    # performing OR operations we have to use Q object from the Q class
     # Products: Inventory < 10 OR price < 20
-    # query_set = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20)) # you can use & (for and) ~Q (for negating results)
+    # query_set = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
+        # We can also use & (for and) ~Q (for negating results)
     
     # Referencing fields using F Objects, F (meaning fields) used for referencing fields
     # Products: inventory = price
