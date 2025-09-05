@@ -11,17 +11,25 @@ from django.db import connection
 from django.http import HttpResponse
 from tags.models import TaggedItem
 
-def calculate():
-    x = 1
-    y = 2
-    return x
+# def calculate():
+#     x = 1
+#     y = 2
+#     return x
     
 def say_hello(request):
-    x = calculate()
+    # x = calculate()
     return render(request, 'hello.html', {'name': 'Bamidele'})
     # products = Product.objects.all() # returns a query_set
-    # query_set are lazy and useful for returning complex queries
+    # => Every object model has a default manager called objects
+    # The objects manager has methods to query the database
+        # Most of the methods returns a query_set while some returns a result/value
+        # A query_set is a collection of objects of the model
+        # e.g products above is a query_set of Product objects
+        # You can iterate through a query_set
+        # You can filter a query_set using the filter method
     
+    # query_set are lazy and useful for building complex queries => through chaining
+
     # e.g adding extra queries
     # products.filter().filter().order_by()  # can chain query_sets
     
