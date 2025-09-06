@@ -22,6 +22,7 @@ class InventoryFilter(admin.SimpleListFilter):
 
 @admin.register(models.Product)  # saying this is the admin model for the product class
 class ProductAdmin(admin.ModelAdmin):
+    # we can start defining how the admin interface will look like for the product model
     autocomplete_fields = ['collection']
     prepopulated_fields = {
         'slug': ['title']
@@ -33,16 +34,20 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_select_related = ['collection']
     search_fields = ['title']
-
+    
+    # Adding a column to show the collection title for that product
+    @admin.display(ordering='collection__title', description='Collection')
     def collection_title(self, product):
         return product.collection.title
-
-    @admin.display(ordering='inventory')
+    
+    # Adding computed columns, this have effect on inventory_status column
+    @admin.display(ordering='inventory') # sort the inventory
     def inventory_status(self, product):
         if product.inventory < 10:
             return 'Low'
         return 'OK'
 
+    # 
     @admin.action(description='Clear inventory')
     def clear_inventory(self, request, queryset):
         update_count = queryset.update(inventory=0)
@@ -91,9 +96,17 @@ class OrderItemInline(admin.StackedInline):
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
     inlines = [OrderItemInline]
-    list_display = ['id', 'placed_at', 'customer']
+    list_display = ['id', 'placed_at', 'customer', 'order_items']
     list_per_page = 10
     ordering = ['-placed_at']
+    
+    @admin.display(description="Products")
+    def order_items(self, order):
+        # join all product titles from this order into a comma-separated string
+        return ", ".join([item.product.title for item in order.orderitem_set.all()])
+    
+    # TODO: I want to be able to click on each others (maybe placed at or customer (from the orders page))
+    # So I can view or see what they ordered from the admin's end
 
 
 @admin.register(models.Collection)
@@ -112,6 +125,7 @@ class CollectionAdmin(admin.ModelAdmin):
         )
         return format_html('<a href="{}"> {} </a>', url, collection.products_count)  # this is the annotated field
 
+    # Actual section that allows us the products_count column to display
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
             products_count=Count('product')
