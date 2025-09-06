@@ -163,6 +163,9 @@ def say_hello(request):
     #     object_id=1
     # )
     
+    # # BUIDLING CUSTOM MANAGER
+    # queryset = TaggedItem.objects.get_tags_for(Product, 1)
+    
     # UNDERSTANDING QUERYSET CACHE
     queryset = Product.objects.all()
     # DJANGO store value in queryset cache after the first evaluation
@@ -176,21 +179,25 @@ def say_hello(request):
     # queryset[0]  # hits the db
     # list(queryset) # hits the db again
     # 
-    return render(request, 'hello.html', {'name': 'Bamidele', 'products': list(queryset)})
+    # return render(request, 'hello.html', {'name': 'Bamidele', 'products': list(queryset)})
     
     
-    # # BUIDLING CUSTOM MANAGER
-    # queryset = TaggedItem.objects.get_tags_for(Product, 1)
-    
+    # =====================================================
     # CREATING OBJECTS (individual creations or using keyword arguments)
+    # ======================================================
     # keyword arguments have some issues with attributes
+    # e.g collection = Collection(title='Video Game')
+    
     # collection = Collection()
     # collection.title = 'Video Games'
+    # ------------------------------------------
+    # setting featured product (Method 1)
     # collection.featured_product = Product(pk=1)
+    # ------------------- Method 2 Either ways the product needs to exist
     # # collection.featured_product_id = 1 -> works as above
     # collection.save()
     
-    # using create method to create objects
+    # using create method to create objects (and passing keyword arguments)
     # collection = Collection.objects.create(
     #     title='a',
     #     'featured_product_id'=1)
@@ -202,7 +209,7 @@ def say_hello(request):
     # collection.featured_product = None
     # collection.save()
     
-    # BEST WAY
+    # BEST WAY (using traditional method where attributes are dynamically handled in case of updates)
     # collection = Collection.objects.get(pk=11)
     # # collection.title = 'Games'  ==> without title, django will set the title field to empty string when not explicitly set
     # collection.featured_product = None
