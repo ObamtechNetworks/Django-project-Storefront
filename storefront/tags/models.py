@@ -22,7 +22,7 @@ class Tag(models.Model):
 
 
 class TaggedItem(models.Model):
-    objects = TaggedItemManager()
+    objects = TaggedItemManager() # custom manager to get tags for an object
     # what tag applied to what object
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     # know what type of item (product? video? article? whatever)

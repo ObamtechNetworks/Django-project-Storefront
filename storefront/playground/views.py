@@ -18,7 +18,8 @@ from tags.models import TaggedItem
     
 def say_hello(request):
     # x = calculate()
-    return render(request, 'hello.html', {'name': 'Bamidele'})
+    # return render(request, 'hello.html', {'name': 'Bamidele'})
+    
     # products = Product.objects.all() # returns a query_set
     # => Every object model has a default manager called objects
     # The objects manager has methods to query the database
@@ -79,6 +80,8 @@ def say_hello(request):
     # query_set = Product.objects.filter(inventory=F('unit_price'))
     
     # SORTING DATA
+    # queryset = Product.objects.order_by('title', '-unit_price') # sort by title asc, unit_price desc
+    # return render(request, 'hello.html', {'name': 'Bamidele', 'products': list(queryset)})
     # query_set = Product.objects.order_by('title') # ascending order, to do desc, add -title, this also allows for multiple fieldnames
     # query_set = Product.objects.order_by('-title').reverse() # ascending order, to do desc, add -title, this also allows for multiple fieldnames
     # product = Product.objects.order_by('unit_price')[0] # get the first item
@@ -89,8 +92,8 @@ def say_hello(request):
     # query_set = Product.objects.all()[:5] # [5:10]
     
     # SELECTING FIELDS TO QUERY
-    # query_set = Product.objects.values('id', 'title', 'collection__title') # a dictionary object is returned
-    # query_set = Product.objects.values_list('id', 'title', 'collection__title') # a tuple object is returned
+    # query_set = Product.objects.values('id', 'title', 'collection__title') # a dictionary object is returned, a related field is added
+    # query_set = Product.objects.values_list('id', 'title', 'collection__title') # a tuple object is returned -- faster than values()
     
     # EXERCISE - SELECT PRODUCTS THAT HAVE BEEN ORDERED AND SORT THEM BY TITLED
     # query_set = OrderItem.objects.values('product__title').distinct().order_by('product__title')
@@ -104,10 +107,12 @@ def say_hello(request):
     # query_set = Product.objects.defer('description')  # also have to be CAREFUL with this query method
     
     # SELECTING RELATED QUERY
-    # using select_related(1)
-    # prefetch_related(n) // many objects
+    # using select_related(1) (1 object -- foreign key or one to one)
+    # we use prefetch_related(n) for many objects, many to many or reverse foreign key
     # query_set = Product.objects.select_related('collection').all()
     # query_set = Product.objects.prefetch_related('promotions').all()
+    
+    # Combining both
     # query_set = Product.objects.prefetch_related('promotions').select_related('collection').all()
     
     # EXERCISE
@@ -119,7 +124,7 @@ def say_hello(request):
     # result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
     
     # Annotating objects -adding additional attributes to objects when querying them
-    # queryset = Customer.objects.annotate(is_new=Value(True))  # receives or expects an expression
+    # queryset = Customer.objects.annotate(is_new=Value(True))  # receives or expects an expression e.g value, func, F, Aggregate
     # queryset = Customer.objects.annotate(new_id=F('id') + 1)  # give customer new Id -- a new field using the F class
     # receives or expects an expression
     # expression: value, func, F, Aggregate
@@ -132,10 +137,10 @@ def say_hello(request):
     #     # full_name =Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
     # )
     
-    #  using the Concat Object
+    #  Shortcut, Using the Concat Object
     
     # queryset = Customer.objects.annotate(
-    #     # using the Concat object
+    #     # we'd create a Concat object
     #     full_name=Concat('first_name', Value(' '), 'last_name')  # research more django database functions
     # )
     
@@ -158,10 +163,27 @@ def say_hello(request):
     #     object_id=1
     # )
     
+    # UNDERSTANDING QUERYSET CACHE
+    queryset = Product.objects.all()
+    # DJANGO store value in queryset cache after the first evaluation
+    # so the second time it doesn't have to go back to the db
+    # for performance optimization
+    # list(queryset)  # first evaluation, hits the db
+    # list(queryset)  # second evaluation, uses the cache
+    # caching happens only when the entire query_set is evaluated first
+    # In contrast, if we access an individual element first and then convert to a list
+    # We'd end up with two query to the db
+    # queryset[0]  # hits the db
+    # list(queryset) # hits the db again
+    # 
+    return render(request, 'hello.html', {'name': 'Bamidele', 'products': list(queryset)})
+    
+    
     # # BUIDLING CUSTOM MANAGER
     # queryset = TaggedItem.objects.get_tags_for(Product, 1)
     
-    # CREATING OBJECTS (individual creations or using keyword arguments) keyword arguments have some issues with attributesvhsnhr
+    # CREATING OBJECTS (individual creations or using keyword arguments)
+    # keyword arguments have some issues with attributes
     # collection = Collection()
     # collection.title = 'Video Games'
     # collection.featured_product = Product(pk=1)
@@ -223,5 +245,4 @@ def say_hello(request):
     # with connection.curspyth
     
     
-
     #return render(request, 'hello.html', {'name': 'Bamidele',}) # 'result': list(queryset_raw)})
