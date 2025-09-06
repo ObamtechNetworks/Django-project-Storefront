@@ -210,11 +210,12 @@ def say_hello(request):
     # collection.save()
     
     # BEST WAY (using traditional method where attributes are dynamically handled in case of updates)
-    # collection = Collection.objects.get(pk=11)
-    # # collection.title = 'Games'  ==> without title, django will set the title field to empty string when not explicitly set
+    # collection = Collection.objects.get(pk=11) first we have to read the object from the database, get it's id
+    # # collection.title = 'Games'  ==> still without title, django will set the title field to empty string when not explicitly set
     # collection.featured_product = None
     # collection.save()
     
+    # BEST USING update() METHOD
     # Collection.objects.filter(pk=11).update(featured_product=None)
     
     # DELETING OBJECTS
@@ -222,10 +223,19 @@ def say_hello(request):
     # collections = Collection(pk=11)
     # collections.delete()
     
-    # OR
+    # OR, this is suitable for deleting multiple objects
+    # Collection.objects.filter(pk=11).delete()  # deletes collection with id 11
     # Collection.objects.filter(id__gt=5).delete()  # all collections with id greater than 5
     
+    
+    # sometimes we want to make multiple changes to our db in an atomic way
+    # meaning all changes should be saved together or if one of the changes failed, all changes should be rolled back
+    
+    # ===============================================
+    # Transactions in Django or DB is what is used to handle such a situation 
+    # This helps to put our db in a consistent state
     # TRANSACTIONS -->django.orm import transaction
+    
     # @transaction.atomic() can be used as a decorator for a function, wrapping around a function or can be use with a 'with clause'
     
     # with transaction.atomic():
@@ -240,16 +250,21 @@ def say_hello(request):
     #     item.unit_price = 10
     #     item.save()
     
-    # EXECUTING RAW SQL QUERIES
+    # ===============================
+    # EXECUTING RAW SQL QUERIES - using the objects.raw() method
+    # ===============================
     # queryset_raw = Product.objects.raw('SELECT * FROM store_product')
     
-    # using the connection object
+    # using connection to create a cursor object
     # cursor = connection.cursor()
-    # cursor.execute('')
-    # cursor.close() # needs to close cursor
+    # cursor.execute('') # SQL query goes here
+    # cursor.close() # needs to close cursor to free up resources
     
     # OR USING WITH CONTEXT MANAGER TO HANDLE CLOSING EASILY
-    # with connection.curspyth
+    # with connection.cursor() as cursor:
+    #     cursor.execute('SELECT * FROM store_product')
+    
+    # We can call stored procedures too using cursor.callproc('procedure_name')
     
     
     #return render(request, 'hello.html', {'name': 'Bamidele',}) # 'result': list(queryset_raw)})
