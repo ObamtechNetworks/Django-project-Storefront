@@ -1,7 +1,9 @@
 from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.html import format_html, urlencode
+# from tags.models import TaggedItem 
 from . import models
 
 
@@ -21,6 +23,14 @@ class InventoryFilter(admin.SimpleListFilter):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
 
+# # this dependency has been taken cared of by store_custom app
+# class TagInline(GenericTabularInline):
+#     model = TaggedItem
+#     autocomplete_fields = ['tag']
+#     extra = 0
+#     min_num = 1
+#     max_num = 10
+
 @admin.register(models.Product)  # saying this is the admin model for the product class
 class ProductAdmin(admin.ModelAdmin):
     # we can start defining how the admin interface will look like for the product model
@@ -29,6 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
         'slug': ['title']
     }
     actions = ['clear_inventory']
+    # inlines = [TagInline] # this dependency has been taken cared of by store_custom app
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     list_editable = ['unit_price']
     list_filter  = ['collection', 'last_update', InventoryFilter]

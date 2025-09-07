@@ -12,10 +12,13 @@ class TagInline(GenericTabularInline):
     autocomplete_fields = ['tag']
     model = TaggedItem
 
+# This class extends the ProductAdmin class from store/admin.py
+# and adds the TagInline to it
 class CustomProductAdmin(ProductAdmin):
     inlines = [
         TagInline
     ]
 
+# Unregister the original Product admin and register the new one
 admin.site.unregister(Product)
 admin.site.register(Product, CustomProductAdmin)
