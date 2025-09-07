@@ -99,14 +99,22 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'customer', 'order_items']
     list_per_page = 10
     ordering = ['-placed_at']
+    list_select_related = ['customer']  # to avoid n+1 query problem
+    search_fields = ['customer__first_name__istartswith', 'customer__last_name__istartswith']
+    # to make some fields readonly
+    # readonly_fields = ['id', 'placed_at', 'customer']  # can't edit these fields
     
-    @admin.display(description="Products")
+    @admin.display(description="Products Ordered")
     def order_items(self, order):
         # join all product titles from this order into a comma-separated string
         return ", ".join([item.product.title for item in order.orderitem_set.all()])
     
-    # TODO: I want to be able to click on each others (maybe placed at or customer (from the orders page))
-    # So I can view or see what they ordered from the admin's end
+    # A way to set special permissions for the order model 
+    # def has_change_permission(self, request, obj=None):
+    #     if obj is not None:
+    #         return False
+    #     return super().has_change_permission(request, obj=obj)
+    
 
 
 @admin.register(models.Collection)
