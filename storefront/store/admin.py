@@ -5,10 +5,12 @@ from django.utils.html import format_html, urlencode
 from . import models
 
 
+# custom filter class for inventory on the product admin page
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
     parameter_name = 'inventory'
-
+    
+    # this is what will be displayed in the admin page filter sidebar
     def lookups(self, request, model_admin):
         # return a list of tuples
         return [
@@ -18,7 +20,6 @@ class InventoryFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
-        return queryset
 
 @admin.register(models.Product)  # saying this is the admin model for the product class
 class ProductAdmin(admin.ModelAdmin):
@@ -47,13 +48,13 @@ class ProductAdmin(admin.ModelAdmin):
             return 'Low'
         return 'OK'
 
-    # 
+    # ADDING CUSTOM ACTIONS
     @admin.action(description='Clear inventory')
     def clear_inventory(self, request, queryset):
-        update_count = queryset.update(inventory=0)
+        updated_count = queryset.update(inventory=0)
         self.message_user(
             request, 
-            f'{update_count} products were successfully updated',
+            f'{updated_count} products inventory were successfully updated',
             messages.ERROR
         )
 
@@ -120,7 +121,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']
-    search_fields = ['title']
+    search_fields = ['title'] # search by title only and works hand in hand with the ProductAdmin autocomplete_fields for collection
     
     @admin.display(ordering='products_count')
     def products_count(self, collection):
