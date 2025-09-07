@@ -96,7 +96,7 @@ class OrderItemInline(admin.StackedInline):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
-    inlines = [OrderItemInline]
+    inlines = [OrderItemInline] # to show the order items inline
     list_display = ['id', 'placed_at', 'customer', 'order_items']
     list_per_page = 10
     ordering = ['-placed_at']
