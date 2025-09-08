@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+.secret
+store/migrations/0007_auto_20250905_2047.py
+../.idea/*
+.idea/*
+.vscode/*
+.DS_Store
+*.log
+db.sqlite3
+.idea/
