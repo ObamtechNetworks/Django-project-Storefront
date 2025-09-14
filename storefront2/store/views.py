@@ -15,8 +15,8 @@ from .serializers import ProductSerializer
 # Now let's use Django REST framework to return JSON response
 @api_view()
 def product_list(request):
-    queryset = Product.objects.all() # fetch all products from the database
-    serializer = ProductSerializer(queryset, many=True) # serialize / convert queryset data to a list of dictionaries
+    queryset = Product.objects.select_related('collection').all() # fetch all products from the database
+    serializer = ProductSerializer(queryset, many=True, context={'request': request}) # serialize / convert queryset data to a list of dictionaries
     return Response(serializer.data) # return serialized data as JSON response
 
 @api_view()
@@ -34,3 +34,7 @@ def product_detail(request, id):
     product = get_object_or_404(Product, pk=id) # if not found, raises Http404 exception
     serializer = ProductSerializer(product) # serialize / convert object data to a dictionary
     return Response(serializer.data) # return serialized data as JSON response
+
+@api_view()
+def collection_detail(request, pk):
+    return HttpResponse('ok')
