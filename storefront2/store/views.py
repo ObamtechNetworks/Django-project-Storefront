@@ -13,11 +13,17 @@ from .serializers import ProductSerializer
 #     return HttpResponse('ok')
 
 # Now let's use Django REST framework to return JSON response
-@api_view()
+
+@api_view(['GET', 'POST']) # specify allowed HTTP methods
 def product_list(request):
-    queryset = Product.objects.select_related('collection').all() # fetch all products from the database
-    serializer = ProductSerializer(queryset, many=True, context={'request': request}) # serialize / convert queryset data to a list of dictionaries
-    return Response(serializer.data) # return serialized data as JSON response
+    if request.method == 'GET':
+        queryset = Product.objects.select_related('collection').all() # fetch all products from the database
+        serializer = ProductSerializer(queryset, many=True, context={'request': request}) # serialize / convert queryset data to a list of dictionaries
+        return Response(serializer.data) # return serialized data as JSON response
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data) # deserialize / convert JSON data to a Product instance
+        # serializer.validated_data
+        return Response('ok')
 
 @api_view()
 def product_detail(request, id):
