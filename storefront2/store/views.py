@@ -23,8 +23,12 @@ def product_list(request):
     elif request.method == 'POST':
         serializer = ProductSerializer(data=request.data) # deserialize / convert JSON data to a Product instance
         serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
-        print(serializer.validated_data) # we'd save in database in next lesson
-        return Response('ok')
+        # next is to save the data to the database
+        serializer.save() # save the validated data to the database
+        # return the created product data with 201 status code
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # print(serializer.validated_data) # we'd save in database in next lesson
+        # return Response('ok')
     
 
 @api_view()

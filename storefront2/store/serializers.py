@@ -69,6 +69,9 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'description',
+            'slug',
+            'inventory',
             'unit_price',
             'price_with_tax',
             'collection',
@@ -79,6 +82,26 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
+    
+    # let's override the create and update methods to customize the behavior when creating or updating a product
+    # but we don't need to override these unless we want to customize the behavior
+    # def create(self, validated_data):
+    #     product = Product(**validated_data) # unpack the validated data dictionary to create a Product instance
+    #     product.other = 1
+    #     product.save() # save the instance to the database
+    #     return product
+    
+    # overriding the update method
+    # but we don't need to override this unless we want to customize the update behavior
+    # def update(self, instance, validated_data):
+    #     instance.title = validated_data.get('title', instance.title)
+    #     instance.description = validated_data.get('description', instance.description)
+    #     instance.slug = validated_data.get('slug', instance.slug)
+    #     instance.unit_price = validated_data.get('unit_price', instance.unit_price)
+    #     instance.inventory = validated_data.get('inventory', instance.inventory)
+    #     instance.collection = validated_data.get('collection', instance.collection)
+    #     instance.save() # save the updated instance to the database
+    #     return instance
     
     # we can also add custom validation to the serializer fields
     # a sample field-level validation method
