@@ -59,10 +59,10 @@ class ProductSerializer(serializers.ModelSerializer):
     #     max_digits=6, decimal_places=2, source='unit_price'
     # )  # renaming unit_price to price
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
-    collection = serializers.HyperlinkedRelatedField(
-        queryset=Collection.objects.all(),
-        view_name='collection-detail'
-    )  # using hyperlinked related field for collection, by default model serializer would use PrimaryKeyRelatedField
+    # collection = serializers.HyperlinkedRelatedField(
+    #     queryset=Collection.objects.all(),
+    #     view_name='collection-detail'
+    # )  # using hyperlinked related field for collection, by default model serializer would use PrimaryKeyRelatedField
 
     class Meta:
         model = Product  # specify the model to be serialized
@@ -79,6 +79,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
+    
+    # we can also add custom validation to the serializer fields
+    # a sample field-level validation method
+    # def validate(self, data):
+    #     # object-level validation
+    #     if data['password'] != data['confirm_password']:
+    #         raise serializers.ValidationError("Passwords do not match")
+    #     return data
     
 # we can also create a serializer for the Collection model if needed
 class CollectionSerializer(serializers.ModelSerializer):
