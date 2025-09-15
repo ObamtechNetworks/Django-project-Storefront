@@ -31,7 +31,7 @@ def product_list(request):
         # return Response('ok')
     
 
-@api_view()
+@api_view(['GET', 'PATCH', 'PUT',]) # PUT is for full update, PATCH is for partial update
 def product_detail(request, id):
     # fetch the product from the database
     # try: ===> replaced with get_object_or_404
@@ -43,9 +43,21 @@ def product_detail(request, id):
     #     return Response({'error': 'Product not found'}, status.HTTP_404_NOT_FOUND)
     
     # ==> simplified using get_object_or_404
+    # brought this outside the if-else since it's common to all methods
     product = get_object_or_404(Product, pk=id) # if not found, raises Http404 exception
-    serializer = ProductSerializer(product) # serialize / convert object data to a dictionary
-    return Response(serializer.data) # return serialized data as JSON response
+    if request.method == 'GET':
+        serializer = ProductSerializer(product) # serialize / convert object data to a dictionary
+        return Response(serializer.data) # return serialized data as JSON response
+    elif request.method == 'PUT':
+        serializer = ProductSerializer(product, data=request.data) # deserialize / convert JSON data to a Product instance
+        serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
+        serializer.save() # save the validated data to the database
+        return Response(serializer.data) # return the updated product data
+    elif request.method == 'PATCH':
+        serializer = ProductSerializer(product, data=request.data, partial=True) # partial=True allows partial updates
+        serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
+        serializer.save() # save the validated data to the database
+        return Response(serializer.data) # return the updated product data
 
 @api_view()
 def collection_detail(request, pk):
