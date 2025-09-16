@@ -113,6 +113,8 @@ class ProductSerializer(serializers.ModelSerializer):
     
 # we can also create a serializer for the Collection model if needed
 class CollectionSerializer(serializers.ModelSerializer):
+    products_count = serializers.IntegerField(read_only=True)
+        
     class Meta:
         model = Collection
-        fields = ['id', 'title', ]
+        fields = ['id', 'title', 'products_count'] # products_count will be annotated in the view
