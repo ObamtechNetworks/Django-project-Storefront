@@ -3,6 +3,7 @@ from django.db.models.aggregates import Count
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
 from .models import Collection, Product
 from .serializers import CollectionSerializer, ProductSerializer
@@ -15,6 +16,8 @@ from .serializers import CollectionSerializer, ProductSerializer
 
 # Now let's use Django REST framework to return JSON response
 
+"""
+# NOTE: These types of views below are all called **funcition based views.**
 @api_view(['GET', 'POST']) # specify allowed HTTP methods
 def product_list(request):
     if request.method == 'GET':
@@ -100,3 +103,49 @@ def collection_list(request):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+"""
+
+# CLASS BASED VIEWS
+class ProductList(APIView):
+    # two methods, get method for GET requests, and post method for POST requests
+    def get(self, request):
+        queryset = Product.objects.select_related('collection').all() # fetch all products from the database
+        serializer = ProductSerializer(
+            queryset, many=True, context={'request': request})
+        return Response(serializer.data) # return serialized data as JSON response
+    
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data) # deserialize / convert JSON data to a Product instance
+        serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
+        # next is to save the data to the database
+        serializer.save() # save the validated data to the database
+        # return the created product data with 201 status code
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+class ProductDetail(APIView):
+    def get(self, request, id):
+        product = get_object_or_404(Product, pk=id) # if not found, raises Http404 exception
+        serializer = ProductSerializer(product) 
+        return Response(serializer.data)
+    
+    def put(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, data=request.data) # deserialize / convert JSON data to a Product instance
+        serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
+        serializer.save() # save the validated data to the database
+        return Response(serializer.data) # return the updated product data
+    
+    def patch(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, data=request.data, partial=True) # partial=True allows partial updates
+        serializer.is_valid(raise_exception=True) # validate the data (this reduces code without needing if-else)
+        serializer.save() # save the validated data to the database
+        return Response(serializer.data) # return the updated product data
+    
+    def delete(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        if product.orderitems.count() > 0: # check if the product is associated with any order items
+            return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete() # delete the product from the database
+        return Response(status=status.HTTP_204_NO_CONTENT) # return 204 No Content status code
