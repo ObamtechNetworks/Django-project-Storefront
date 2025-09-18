@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import api_view
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -125,7 +126,7 @@ class ProductList(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 """
-
+"""
 class ProductDetail(APIView):
     def get(self, request, id):
         product = get_object_or_404(Product, pk=id) # if not found, raises Http404 exception
@@ -214,3 +215,39 @@ class CollectionDetail(RetrieveUpdateDestroyAPIView):
         if collection.products.count() > 0:
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().delete(request, *args, **kwargs)
+"""
+
+# Learning about ViewSets
+# advantage of viewsets is that we can combine multiple views into a single class
+# and we can use routers to automatically generate the URL conf for the viewset
+# this reduces boilerplate code and makes it easier to maintain
+# we can use ModelViewSet which provides all the CRUD operations by default
+# we can also use ReadOnlyModelViewSet which provides only read operations (GET)
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+    def destroy(self, request, *args, **kwargs):
+        product = self.get_object() # get the product instance
+        if product.orderitems.count() > 0: # check if the product is associated with any order items
+            return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs) # call the superclass delete method to perform the deletion
+
+# Viewset for Collections
+class CollectionViewSet(ModelViewSet):
+    queryset = Collection.objects.annotate(
+        products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+    def destroy(self, request, *args, **kwargs):
+        collection = self.get_object()
+        if collection.products.count() > 0:
+            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
