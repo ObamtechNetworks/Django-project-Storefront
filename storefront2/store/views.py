@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models.aggregates import Count
 from django.http import HttpResponse
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -105,7 +106,7 @@ def collection_list(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 """
-
+"""
 # CLASS BASED VIEWS
 class ProductList(APIView):
     # two methods, get method for GET requests, and post method for POST requests
@@ -122,7 +123,8 @@ class ProductList(APIView):
         serializer.save() # save the validated data to the database
         # return the created product data with 201 status code
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
+"""
 
 class ProductDetail(APIView):
     def get(self, request, id):
@@ -150,3 +152,49 @@ class ProductDetail(APIView):
             return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product.delete() # delete the product from the database
         return Response(status=status.HTTP_204_NO_CONTENT) # return 204 No Content status code
+
+
+# Using Generic Class Based Views to reduce boilerplate code
+class ProductList(ListCreateAPIView):
+    
+    # no logic let's make it consise:
+    queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
+    
+    # this method is needed to pass request context to serializer for HyperlinkedRelatedField
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+    # All these methods are useful if we want to customize the behaviour and add some logic
+    # def get_queryset(self):
+    #     return Product.objects.select_related('collection').all()
+    
+    # def get_serializer_class(self):
+    #     return ProductSerializer
+    
+    # # override to pass request context to serializer for HyperlinkedRelatedField
+    # def get_serializer_context(self):
+    #     return {'request': self.request}
+    
+# converting collection_list to class based generic view
+class CollectionList(ListCreateAPIView):
+    queryset = Collection.objects.annotate(
+        products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+class CollectionDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Collection.objects.annotate(
+        products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+    def delete(self, request, *args, **kwargs):
+        collection = self.get_object()
+        if collection.products.count() > 0:
+            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().delete(request, *args, **kwargs)
