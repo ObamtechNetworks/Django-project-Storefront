@@ -176,6 +176,22 @@ class ProductList(ListCreateAPIView):
     # def get_serializer_context(self):
     #     return {'request': self.request}
     
+
+# customizing generic view
+class ProductDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
+    # lookup_field = 'id' # this is used to specify the field to be used for lookup, default is 'pk'
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+    def delete(self, request, *args, **kwargs):
+        product = self.get_object() # get the product instance
+        if product.orderitems.count() > 0: # check if the product is associated with any order items
+            return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().delete(request, *args, **kwargs) # call the superclass delete method to perform the deletion
+    
 # converting collection_list to class based generic view
 class CollectionList(ListCreateAPIView):
     queryset = Collection.objects.annotate(
