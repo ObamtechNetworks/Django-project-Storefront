@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import Collection, Product
+from .models import Collection, OrderItem, Product
 from .serializers import CollectionSerializer, ProductSerializer
 
 # Create your views here.
@@ -232,8 +232,11 @@ class ProductViewSet(ModelViewSet):
         return {'request': self.request}
     
     def destroy(self, request, *args, **kwargs):
-        product = self.get_object() # get the product instance
-        if product.orderitems.count() > 0: # check if the product is associated with any order items
+        # product = self.get_object() # get the product instance
+        # if product.orderitems.count() > 0: # check if the product is associated with any order items
+        #     return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        # writing above as:
+        if OrderItem.objects.filter(product_id=kwargs['pk']).count() > 0:
             return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs) # call the superclass delete method to perform the deletion
 
@@ -247,7 +250,10 @@ class CollectionViewSet(ModelViewSet):
         return {'request': self.request}
     
     def destroy(self, request, *args, **kwargs):
-        collection = self.get_object()
-        if collection.products.count() > 0:
+        # collection = self.get_object()
+        # if collection.products.count() > 0:
+        #     return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        # re-writing above as:
+        if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
