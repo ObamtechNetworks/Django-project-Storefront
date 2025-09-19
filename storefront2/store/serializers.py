@@ -6,7 +6,7 @@ into native Python datatypes that can then be easily rendered into JSON, XML, or
 from decimal import Decimal
 from rest_framework import serializers
 
-from store.models import Product, Collection
+from store.models import Product, Collection, Review
 
 # through this we can include nested serializer object in the product serializer
 # class CollectionSerializer(serializers.Serializer):
@@ -118,3 +118,8 @@ class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ['id', 'title', 'products_count'] # products_count will be annotated in the view
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'name', 'description', 'product', 'date']

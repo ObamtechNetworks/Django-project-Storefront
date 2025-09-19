@@ -8,8 +8,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import Collection, OrderItem, Product
-from .serializers import CollectionSerializer, ProductSerializer
+from .models import Collection, OrderItem, Product, Review
+from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -257,3 +257,8 @@ class CollectionViewSet(ModelViewSet):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
+    
+# we can also create a viewset for reviews if needed
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
