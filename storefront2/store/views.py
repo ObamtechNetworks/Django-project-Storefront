@@ -225,8 +225,20 @@ class CollectionDetail(RetrieveUpdateDestroyAPIView):
 # we can also use ReadOnlyModelViewSet which provides only read operations (GET)
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all() # to allow filtering, we would override get_queryset method
     serializer_class = ProductSerializer
+    
+    def get_queryset(self):
+        # get all objects first
+        queryset = Product.objects.all()
+        # attempt to get the collection_id from query parameters
+        collection_id = self.request.query_params.get('collection_id')
+        # if collection_id is provided, filter the queryset
+        if collection_id is not None:
+            queryset = queryset.filter(collection_id=collection_id)
+        
+        # now return this queryset
+        return queryset
     
     def get_serializer_context(self):
         return {'request': self.request}
