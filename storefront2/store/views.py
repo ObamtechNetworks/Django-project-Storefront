@@ -1,13 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+# from django.shortcuts import render, get_object_or_404
 from django.db.models.aggregates import Count
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.decorators import api_view
+from rest_framework.filters import SearchFilter
+# from rest_framework.mixins import CreateModelMixin, ListModelMixin
+# from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+# from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework.views import APIView
+# from rest_framework.views import APIView
 from rest_framework import status
 
 from store.filters import ProductFilter
@@ -231,10 +232,12 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all() # brought this back since we are now using generic filtering
     serializer_class = ProductSerializer
     # let's use generic filtering instead of manual filtering
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     # specify fields to filter by
     # filterset_fields = ['collection_id'] # allow filtering by collection_id
     filterset_class = ProductFilter # since we've created a custom filter class and defined fields to filter
+    search_fields = ['title', 'description'] # allow searching by title and description
+    # above line allows searching with ?search=keyword in the URL
     
     # Now we can remove the ovridden get_queryset method below
     # def get_queryset(self):
