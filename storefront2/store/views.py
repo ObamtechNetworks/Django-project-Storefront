@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models.aggregates import Count
 from django.http import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import api_view
@@ -225,20 +226,25 @@ class CollectionDetail(RetrieveUpdateDestroyAPIView):
 # we can also use ReadOnlyModelViewSet which provides only read operations (GET)
 
 class ProductViewSet(ModelViewSet):
-    # queryset = Product.objects.all() # to allow filtering, we would override get_queryset method
+    queryset = Product.objects.all() # brought this back since we are now using generic filtering
     serializer_class = ProductSerializer
+    # let's use generic filtering instead of manual filtering
+    filter_backends = [DjangoFilterBackend]
+    # specify fields to filter by
+    filterset_fields = ['collection_id'] # allow filtering by collection_id
     
-    def get_queryset(self):
-        # get all objects first
-        queryset = Product.objects.all()
-        # attempt to get the collection_id from query parameters
-        collection_id = self.request.query_params.get('collection_id')
-        # if collection_id is provided, filter the queryset
-        if collection_id is not None:
-            queryset = queryset.filter(collection_id=collection_id)
+    # Now we can remove the ovridden get_queryset method below
+    # def get_queryset(self):
+    #     # get all objects first
+    #     queryset = Product.objects.all()
+    #     # attempt to get the collection_id from query parameters
+    #     collection_id = self.request.query_params.get('collection_id')
+    #     # if collection_id is provided, filter the queryset
+    #     if collection_id is not None:
+    #         queryset = queryset.filter(collection_id=collection_id)
         
         # now return this queryset
-        return queryset
+        # return queryset
     
     def get_serializer_context(self):
         return {'request': self.request}
