@@ -1,19 +1,28 @@
 from django.urls import include, path
-from rest_framework.routers import SimpleRouter, DefaultRouter
+# from rest_framework.routers import SimpleRouter, DefaultRouter
+from rest_framework_nested import routers
 from . import views
 
 # from pprint import pprint
 
-# create an instance of a simplerouter class
-router = DefaultRouter()
+router = routers.DefaultRouter()  # creates a router instance
 
 # register the viewsets with the router
-router.register('products', views.ProductViewSet)
-router.register('collections', views.CollectionViewSet)
+router.register(r'products', views.ProductViewSet)
+router.register(r'collections', views.CollectionViewSet)
 # next is to include the router urls in the urlpatterns
 # pprint(router.urls)
 
-urlpatterns = router.urls
+products_router = routers.NestedDefaultRouter(router, r'products', lookup='product')
+# let's register our child routes with the nested router
+products_router.register(r'reviews', views.ReviewViewSet, basename='product-reviews')
+
+urlpatterns = [
+    path(r'', include(router.urls)),  # include the router urls
+    path(r'', include(products_router.urls)),  # include the nested router urls
+]
+
+# urlpatterns = router.urls + products_router.urls # combine the two router urls
 # we can use the below if we have other paths or url patterns for a specific purpose
 # urlpatterns = [
 #     path('', include(router.urls)),
