@@ -260,5 +260,14 @@ class CollectionViewSet(ModelViewSet):
     
 # we can also create a viewset for reviews if needed
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
+    # queryset = Review.objects.all() # we won't use this since we want reviews for a specific product, cos .all() would return all reviews
+    # to do a better implementation, we would override the get_queryset method
+    
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk']) # filter reviews by product_id from the URL
+    
     serializer_class = ReviewSerializer
+    
+    # using a context object we can pass additional data to our serialzier
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
