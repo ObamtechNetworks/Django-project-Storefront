@@ -149,6 +149,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Django REST framework settings
 REST_FRAMEWORK = {
-    'COERCE_DECIMAL_TO_STRING': False # Ensures decimal fields are returned as numbers in JSON responses
+    'COERCE_DECIMAL_TO_STRING': False, # Ensures decimal fields are returned as numbers in JSON responses
+    # this does global pagination for all views, but can be overridden in individual views
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # Use page number pagination
+    # 'PAGE_SIZE': 10, # Default page size for pagination
 }
 

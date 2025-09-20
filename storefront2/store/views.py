@@ -3,6 +3,7 @@ from django.db.models.aggregates import Count
 # from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 # from rest_framework.mixins import CreateModelMixin, ListModelMixin
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.decorators import api_view
@@ -11,7 +12,9 @@ from rest_framework.response import Response
 # from rest_framework.views import APIView
 from rest_framework import status
 
-from store.filters import ProductFilter
+from store.pagination import DefaultPagination
+
+from .filters import ProductFilter
 from .models import Collection, OrderItem, Product, Review
 from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
 
@@ -236,6 +239,9 @@ class ProductViewSet(ModelViewSet):
     # specify fields to filter by
     # filterset_fields = ['collection_id'] # allow filtering by collection_id
     filterset_class = ProductFilter # since we've created a custom filter class and defined fields to filter
+    # pagination in django rest framework
+    # pagination_class = PageNumberPagination
+    pagination_class = DefaultPagination
     search_fields = ['title', 'description'] # allow searching by title and description
     ordering_fields = ['unit_price', 'last_update']
     # above line allows searching with ?search=keyword in the URL
