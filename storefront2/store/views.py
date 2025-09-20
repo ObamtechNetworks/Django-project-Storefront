@@ -9,6 +9,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+
+from store.filters import ProductFilter
 from .models import Collection, OrderItem, Product, Review
 from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
 
@@ -231,7 +233,8 @@ class ProductViewSet(ModelViewSet):
     # let's use generic filtering instead of manual filtering
     filter_backends = [DjangoFilterBackend]
     # specify fields to filter by
-    filterset_fields = ['collection_id'] # allow filtering by collection_id
+    # filterset_fields = ['collection_id'] # allow filtering by collection_id
+    filterset_class = ProductFilter # since we've created a custom filter class and defined fields to filter
     
     # Now we can remove the ovridden get_queryset method below
     # def get_queryset(self):
