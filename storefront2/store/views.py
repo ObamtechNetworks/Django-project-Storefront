@@ -4,10 +4,10 @@ from django.db.models.aggregates import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
-# from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.decorators import api_view
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.response import Response
 # from rest_framework.views import APIView
 from rest_framework import status
@@ -15,8 +15,8 @@ from rest_framework import status
 from store.pagination import DefaultPagination
 
 from .filters import ProductFilter
-from .models import Collection, OrderItem, Product, Review
-from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
+from .models import Cart, Collection, OrderItem, Product, Review
+from .serializers import CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -302,3 +302,13 @@ class ReviewViewSet(ModelViewSet):
     # using a context object we can pass additional data to our serialzier
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
+
+# viewset for Cart model
+class CartViewSet(CreateModelMixin,
+                  RetrieveModelMixin,
+                  GenericViewSet,
+                  DestroyModelMixin):
+    queryset = Cart.objects.prefetch_related('items__product') # prefetch related items and products to reduce number of queries
+    serializer_class = CartSerializer 
+    
+    # how can we retreive a cart and items in that cart

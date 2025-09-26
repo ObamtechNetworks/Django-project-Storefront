@@ -6,7 +6,7 @@ into native Python datatypes that can then be easily rendered into JSON, XML, or
 from decimal import Decimal
 from rest_framework import serializers
 
-from store.models import Product, Collection, Review
+from .models import Cart, CartItem, Product, Collection, Review
 
 # through this we can include nested serializer object in the product serializer
 # class CollectionSerializer(serializers.Serializer):
@@ -128,3 +128,35 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context['product_id']
         return Review.objects.create(product_id=product_id, **validated_data)
+    
+# a 
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price']
+
+
+# cart item serializer
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer() # nested serializer to include product details in the cart item
+    total_price = serializers.SerializerMethodField(read_only=True) # custom field to calculate total price of the cart item
+    
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'total_price']
+        
+    def get_total_price(self, cart_item: CartItem):
+        return cart_item.quantity * cart_item.product.unit_price
+
+# Serializer for Cart model
+class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True) # we want to make the id field read-only so it won't be sent to the client when creating a cart
+    items = CartItemSerializer(many=True, read_only=True) # nested serializer to include cart items in the cart details, many=True because a cart can have multiple items
+    total_price = serializers.SerializerMethodField(read_only=True)
+    
+    def get_total_price(self, cart):
+        return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
+    
+    class Meta:
+        model = Cart
+        fields = ['id', 'items', 'total_price']
