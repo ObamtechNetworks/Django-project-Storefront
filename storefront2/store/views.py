@@ -16,7 +16,7 @@ from store.pagination import DefaultPagination
 
 from .filters import ProductFilter
 from .models import Cart, CartItem, Collection, OrderItem, Product, Review
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -314,12 +314,18 @@ class CartViewSet(CreateModelMixin,
     
 
 class CartItemViewSet(ModelViewSet,):
+    # specify the http methods to allow
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    
     # serializer_class = CartItemSerializer
     
     # We want to dynamically return what serializer depending on the request method
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return AddCartItemSerializer
+        # if it's patch or PUT we are using the updatecartitemserializer instead
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
         return CartItemSerializer
     
     def get_queryset(self):
@@ -328,4 +334,4 @@ class CartItemViewSet(ModelViewSet,):
             .select_related('product')
     
     def get_serializer_context(self):
-        return {'cart_id': self.kwargs['cart_pk']}
+        return {'cartid': self.kwargs['cart_pk']}
