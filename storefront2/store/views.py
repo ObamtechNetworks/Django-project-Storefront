@@ -15,8 +15,8 @@ from rest_framework import status
 from store.pagination import DefaultPagination
 
 from .filters import ProductFilter
-from .models import Cart, Collection, OrderItem, Product, Review
-from .serializers import CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
+from .models import Cart, CartItem, Collection, OrderItem, Product, Review
+from .serializers import CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -294,10 +294,11 @@ class ReviewViewSet(ModelViewSet):
     # queryset = Review.objects.all() # we won't use this since we want reviews for a specific product, cos .all() would return all reviews
     # to do a better implementation, we would override the get_queryset method
     
+    serializer_class = ReviewSerializer
+    
     def get_queryset(self):
         return Review.objects.filter(product_id=self.kwargs['product_pk']) # filter reviews by product_id from the URL
     
-    serializer_class = ReviewSerializer
     
     # using a context object we can pass additional data to our serialzier
     def get_serializer_context(self):
@@ -311,4 +312,13 @@ class CartViewSet(CreateModelMixin,
     queryset = Cart.objects.prefetch_related('items__product') # prefetch related items and products to reduce number of queries
     serializer_class = CartSerializer 
     
-    # how can we retreive a cart and items in that cart
+
+class CartItemViewSet(ModelViewSet):
+    serializer_class = CartItemSerializer
+    def get_queryset(self):
+        return CartItem.objects \
+            .filter(cart_id=self.kwargs['cart_pk']) \
+            .select_related('product')
+    
+    def get_serializer_context(self):
+        return {'cart-id': self.kwargs['cart_pk']}

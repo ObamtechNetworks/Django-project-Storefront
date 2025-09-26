@@ -18,9 +18,15 @@ products_router = routers.NestedDefaultRouter(router, r'products', lookup='produ
 # let's register our child routes with the nested router
 products_router.register(r'reviews', views.ReviewViewSet, basename='product-reviews')
 
+# nested router for carts
+carts_router = routers.NestedDefaultRouter(router, r'carts', lookup='cart')
+# register the child routes with nested router
+carts_router.register(r'items', views.CartItemViewSet, basename='cart-items')
+
 urlpatterns = [
     path(r'', include(router.urls)),  # include the router urls
     path(r'', include(products_router.urls)),  # include the nested router urls
+    path(r'', include(carts_router.urls)) # include the nestedrouter url
 ]
 
 # urlpatterns = router.urls + products_router.urls # combine the two router urls
