@@ -160,3 +160,39 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'items', 'total_price']
+
+class AddCartItemSerializer(serializers.ModelSerializer):
+    # explicitly define product_id field
+    product_id = serializers.IntegerField()
+    
+    # create a product validation logic
+    def validate_product_id(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError('No product with the given ID was found.')
+        return value
+    
+    # override the save method
+    def save(self, **kwargs):
+        # retrieve the cart_id from the request context
+        cart_id = self.context['cart_id']
+        # retrieve product id from request and quanity
+        product_id = self.validated_data['product_id']
+        quantity = self.validated_data['quantity']
+        
+        # saving logic
+        try:
+            #  get a cart item with two attributes, cart_id and product_id
+            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
+            cart_item.quantity += quantity
+            cart_item.save()
+            # set self.instance to the new cartitem
+            self.instance = cart_item
+        except CartItem.DoesNotExist:
+            # create a new cart item if it doesn't exist and save to the self.instance
+            self.instance = CartItem.objects.create(cart_id=cart_id, **self.validated_data)
+
+        return self.instance
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product_id', 'quantity']
