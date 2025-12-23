@@ -47,9 +47,9 @@ INSTALLED_APPS = [
     'playground',
     'debug_toolbar',
     'store',
-    'store_custom',
     'tags',
-    'likes'
+    'likes',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -155,3 +155,5 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10, # Default page size for pagination
 }
 
+# Tell django to use this class instead of the default user class in the authenticaiton system
+AUTH_USER_MODEL = 'core.User'
