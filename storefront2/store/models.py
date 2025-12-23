@@ -91,6 +91,12 @@ class Order(models.Model):
     payment_status = models.CharField(
         max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    
+    # Custom permission to allow order cancellation
+    class Meta:
+        permissions = [
+            ('cancel_order', 'Can cancel order'),
+        ]
 
 
 class OrderItem(models.Model):
