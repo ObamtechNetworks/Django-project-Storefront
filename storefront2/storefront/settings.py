@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'djoser',
     'django_filters',
     'playground',
     'debug_toolbar',
@@ -153,6 +154,13 @@ REST_FRAMEWORK = {
     # this does global pagination for all views, but can be overridden in individual views
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # Use page number pagination
     # 'PAGE_SIZE': 10, # Default page size for pagination
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 # Tell django to use this class instead of the default user class in the authenticaiton system
