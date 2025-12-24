@@ -165,3 +165,10 @@ SIMPLE_JWT = {
 
 # Tell django to use this class instead of the default user class in the authenticaiton system
 AUTH_USER_MODEL = 'core.User'
+
+# Djoser settings
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'core.serializers.UserCreateSerializer',
+    },
+}
