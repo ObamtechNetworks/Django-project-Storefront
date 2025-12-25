@@ -12,6 +12,7 @@ router.register(r'products', views.ProductViewSet, basename='products')
 router.register(r'collections', views.CollectionViewSet)
 router.register(r'carts', views.CartViewSet, basename='carts')  # new route for carts
 router.register(r'customers', views.CustomerViewSet, basename='customers')  # new route for customers
+router.register(r'orders', views.OrderViewSet, basename='orders')  # new route for orders
 # next is to include the router urls in the urlpatterns
 # pprint(router.urls)
 

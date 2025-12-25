@@ -6,7 +6,7 @@ into native Python datatypes that can then be easily rendered into JSON, XML, or
 from decimal import Decimal
 from rest_framework import serializers
 
-from .models import Cart, CartItem, Customer, Product, Collection, Review
+from .models import Cart, CartItem, Customer, Order, OrderItem, Product, Collection, Review
 
 # through this we can include nested serializer object in the product serializer
 # class CollectionSerializer(serializers.Serializer):
@@ -211,3 +211,17 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = ['id', 'user_id', 'phone', 'birth_date', 'membership']
+        
+# Building the OrderItem and Order Serializer
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer() # nested serializer to include product details in the order item
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'unit_price', 'quantity']
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True) # nested serializer to include order items in the order details
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'customer', 'placed_at', 'payment_status', 'items']
