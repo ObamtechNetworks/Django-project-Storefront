@@ -340,7 +340,7 @@ class CartItemViewSet(ModelViewSet,):
             .select_related('product')
     
     def get_serializer_context(self):
-        return {'cartid': self.kwargs['cart_pk']}
+        return {'cart_id': self.kwargs['cart_pk']}
     
 # CREATE THE PROFILE API FOR CUSTOMERS
 class CustomerViewSet(ModelViewSet):
