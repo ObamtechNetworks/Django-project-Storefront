@@ -347,6 +347,8 @@ class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAdminUser] # only admin users can view customer data
+    # we can also use FullDjangoModelPermissions if we want to use django model permissions
+    # permission_classes = [FullDjangoModelPermissions] or DjangoModelPermissions depending on whether we want to include 'view' permissions or not
     
     # def get_permissions(self):
     #     # PROTECT THE 'ME' ENDPOINT
