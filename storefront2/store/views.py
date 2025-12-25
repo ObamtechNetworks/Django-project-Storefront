@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.decorators import api_view
@@ -344,6 +345,18 @@ class CustomerViewSet(CreateModelMixin,
                       DestroyModelMixin):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated] # only authenticated users can access this viewset
+    
+    def get_permissions(self):
+        # PROTECT THE 'ME' ENDPOINT
+        if self.action == 'me':
+             return [IsAuthenticated()]
+             
+        # ALLOW PUBLIC ACCESS TO OTHER GET REQUESTS (e.g. Viewing product lists)
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        
+        return [IsAuthenticated()]
     
     @action(detail=False, methods=['GET', 'PUT'])
     def me(self, request):
