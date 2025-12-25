@@ -6,7 +6,7 @@ into native Python datatypes that can then be easily rendered into JSON, XML, or
 from decimal import Decimal
 from rest_framework import serializers
 
-from .models import Cart, CartItem, Product, Collection, Review
+from .models import Cart, CartItem, Customer, Product, Collection, Review
 
 # through this we can include nested serializer object in the product serializer
 # class CollectionSerializer(serializers.Serializer):
@@ -202,3 +202,12 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ['quantity'] # we only want to update the quantity field for the serializer
+        
+        
+# CREATE THE PROFILE API FOR CUSTOMERS
+class CustomerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField() # (source='user.id', read_only=True)
+    
+    class Meta:
+        model = Customer
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'membership']
