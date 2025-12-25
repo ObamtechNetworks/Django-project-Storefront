@@ -6,6 +6,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAdminUser, DjangoModelPermissions
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.decorators import api_view
@@ -17,6 +18,7 @@ from rest_framework import status
 from store.pagination import DefaultPagination
 
 from .filters import ProductFilter
+from .permissions import IsAdminOrReadOnly # FullDjangoModelPermissions
 from .models import Cart, CartItem, Collection, Customer, OrderItem, Product, Review
 from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CustomerSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
 
@@ -236,6 +238,7 @@ class CollectionDetail(RetrieveUpdateDestroyAPIView):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all() # brought this back since we are now using generic filtering
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly] # only admin users can edit products, others can only read
     # let's use generic filtering instead of manual filtering
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     # specify fields to filter by
@@ -278,6 +281,7 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         products_count=Count('products')).all()
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_serializer_context(self):
         return {'request': self.request}
@@ -339,26 +343,23 @@ class CartItemViewSet(ModelViewSet,):
         return {'cartid': self.kwargs['cart_pk']}
     
 # CREATE THE PROFILE API FOR CUSTOMERS
-class CustomerViewSet(CreateModelMixin,
-                      RetrieveModelMixin,
-                      GenericViewSet,
-                      DestroyModelMixin):
+class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated] # only authenticated users can access this viewset
+    permission_classes = [IsAdminUser] # only admin users can view customer data
     
-    def get_permissions(self):
-        # PROTECT THE 'ME' ENDPOINT
-        if self.action == 'me':
-             return [IsAuthenticated()]
+    # def get_permissions(self):
+    #     # PROTECT THE 'ME' ENDPOINT
+    #     if self.action == 'me':
+    #          return [IsAuthenticated()]
              
-        # ALLOW PUBLIC ACCESS TO OTHER GET REQUESTS (e.g. Viewing product lists)
-        if self.request.method == 'GET':
-            return [AllowAny()]
+    #     # ALLOW PUBLIC ACCESS TO OTHER GET REQUESTS (e.g. Viewing product lists)
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
         
-        return [IsAuthenticated()]
+    #     return [IsAuthenticated()]
     
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
         # We look up by user_id. 
         # If not found, we create one using 'defaults' to fill in the required unique email.
