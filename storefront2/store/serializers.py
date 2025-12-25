@@ -4,6 +4,7 @@ A serializer in Django REST Framework is responsible for converting complex data
 into native Python datatypes that can then be easily rendered into JSON, XML, or other content types.
 """
 from decimal import Decimal
+from django.db import transaction
 from rest_framework import serializers
 
 from .models import Cart, CartItem, Customer, Order, OrderItem, Product, Collection, Review
@@ -232,9 +233,30 @@ class CreateOrderSerializer(serializers.Serializer):
     
     # specify the logic for saving an order
     def save(self, **kwargs):
-        print(self.validated_data['cart_id'])
-        print(self.context['user_id'])
-        
-        # create order
-        (customer, created) = Customer.objects.get_or_create(user_id=self.context['user_id'])
-        Order.objects.create(customer=customer)
+        # wrap all the codes in a transaction to follow database atomic rules 
+        with transaction.atomic():
+            cart_id = self.validated_data['cart_id']
+            
+            # create order
+            (customer, created) = Customer.objects.get_or_create(user_id=self.context['user_id'])
+            order = Order.objects.create(customer=customer)
+            
+            # creating order items
+            # first get items in the cart and for each cart item, get the order items and save in the db
+            cart_items = CartItem.objects \
+                                    .select_related('product')\
+                                    .filter(cart_id=cart_id)
+            order_items = [
+                OrderItem(
+                    order=order,
+                    product= item.product,
+                    unit_price=item.product.unit_price,
+                    quantity=item.quantity
+                ) for item in cart_items
+            ]
+            
+            # insert items in bulk to the db
+            OrderItem.objects.bulk_create(order_items)
+            
+            # delete cart id
+            Cart.objects.filter(pk=cart_id).delete()
