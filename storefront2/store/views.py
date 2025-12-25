@@ -20,7 +20,7 @@ from store.pagination import DefaultPagination
 from .filters import ProductFilter
 from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission # FullDjangoModelPermissions
 from .models import Cart, CartItem, Collection, Customer, Order, OrderItem, Product, Review
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -387,8 +387,17 @@ class CustomerViewSet(ModelViewSet):
 
 # view for orders
 class OrderViewSet(ModelViewSet):
-    serializer_class = OrderSerializer
+    # serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    
+    # dynamically return serializer class based on request method
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+    
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
     
     # ensure order being displayed belongs to the user making the request
     def get_queryset(self):
@@ -398,5 +407,7 @@ class OrderViewSet(ModelViewSet):
         if user.is_staff:
             return Order.objects.all()
         
+        # will need to refactor this line below to ensure command query separation
+        # the overriding of the get_queryset and the use of get or create is not ideal
         (customer_id, created) = Customer.objects.only('id').get_or_create(user_id=user.id)
         return Order.objects.filter(customer_id=customer_id)
