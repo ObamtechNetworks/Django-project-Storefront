@@ -4,6 +4,7 @@ from django.db.models.aggregates import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.decorators import api_view
@@ -343,3 +344,23 @@ class CustomerViewSet(CreateModelMixin,
                       DestroyModelMixin):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        # We look up by user_id. 
+        # If not found, we create one using 'defaults' to fill in the required unique email.
+        customer, created = Customer.objects.get_or_create(
+            user_id=request.user.id,
+            defaults={'email': request.user.email} 
+        )
+        
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(
+                request.user.customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)

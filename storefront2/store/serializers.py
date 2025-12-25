@@ -206,7 +206,7 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
         
 # CREATE THE PROFILE API FOR CUSTOMERS
 class CustomerSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField() # (source='user.id', read_only=True)
+    user_id = serializers.IntegerField(read_only=True) # (source='user.id', read_only=True)
     
     class Meta:
         model = Customer
