@@ -390,14 +390,24 @@ class OrderViewSet(ModelViewSet):
     # serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     
+    # overriding the create method in the ModelViewSet with logics to return created order
+    def create(self, request, *args, **kwargs):
+        serializer = CreateOrderSerializer(
+            data=request.data,
+            context={'user_id': self.request.user.id})
+        serializer.is_valid (raise_exception=True)
+        order = serializer.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    
     # dynamically return serializer class based on request method
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateOrderSerializer
         return OrderSerializer
     
-    def get_serializer_context(self):
-        return {'user_id': self.request.user.id}
+    # def get_serializer_context(self):
+    #     return {'user_id': self.request.user.id}
     
     # ensure order being displayed belongs to the user making the request
     def get_queryset(self):
