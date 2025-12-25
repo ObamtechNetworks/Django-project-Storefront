@@ -11,3 +11,4 @@ store/migrations/0007_auto_20250905_2047.py
 db.sqlite3
 .idea/
 store/migrations/
+token
