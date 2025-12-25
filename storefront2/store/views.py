@@ -15,8 +15,8 @@ from rest_framework import status
 from store.pagination import DefaultPagination
 
 from .filters import ProductFilter
-from .models import Cart, CartItem, Collection, OrderItem, Product, Review
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Collection, Customer, OrderItem, Product, Review
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CustomerSerializer, ProductSerializer, ReviewSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 # Create your views here.
 # these are django builtin HttpRequest and HttpResponse classes
@@ -335,3 +335,11 @@ class CartItemViewSet(ModelViewSet,):
     
     def get_serializer_context(self):
         return {'cartid': self.kwargs['cart_pk']}
+    
+# CREATE THE PROFILE API FOR CUSTOMERS
+class CustomerViewSet(CreateModelMixin,
+                      RetrieveModelMixin,
+                      GenericViewSet,
+                      DestroyModelMixin):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
