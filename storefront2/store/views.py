@@ -387,8 +387,13 @@ class CustomerViewSet(ModelViewSet):
 
 # view for orders
 class OrderViewSet(ModelViewSet):
-    # serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    # ALLOWED METHODS
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+    # override get permissions
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
     
     # overriding the create method in the ModelViewSet with logics to return created order
     def create(self, request, *args, **kwargs):
