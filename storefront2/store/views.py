@@ -369,10 +369,8 @@ class CustomerViewSet(ModelViewSet):
     def me(self, request):
         # We look up by user_id. 
         # If not found, we create one using 'defaults' to fill in the required unique email.
-        customer, created = Customer.objects.get_or_create(
-            user_id=request.user.id,
-            defaults={'email': request.user.email} 
-        )
+        customer = Customer.objects.get(
+            user_id=request.user.id)
         
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)
@@ -425,6 +423,6 @@ class OrderViewSet(ModelViewSet):
             return Order.objects.all()
         
         # will need to refactor this line below to ensure command query separation
-        # the overriding of the get_queryset and the use of get or create is not ideal
-        (customer_id, created) = Customer.objects.only('id').get_or_create(user_id=user.id)
+        # the overriding of the get_queryset and the use of get or create is not ideal => THIS HAS BEEN HANDLED BY USING SIGNALS NOW
+        customer_id = Customer.objects.only('id').get(user_id=user.id)
         return Order.objects.filter(customer_id=customer_id)
