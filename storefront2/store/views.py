@@ -386,7 +386,7 @@ class CustomerViewSet(ModelViewSet):
 # view for orders
 class OrderViewSet(ModelViewSet):
     # ALLOWED METHODS
-    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     # override get permissions
     def get_permissions(self):
         if self.request.method in ['PATCH', 'DELETE']:

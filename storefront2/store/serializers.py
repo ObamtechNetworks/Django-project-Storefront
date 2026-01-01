@@ -8,6 +8,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from .models import Cart, CartItem, Customer, Order, OrderItem, Product, Collection, Review
+from .signals import order_created
 
 # through this we can include nested serializer object in the product serializer
 # class CollectionSerializer(serializers.Serializer):
@@ -273,4 +274,7 @@ class CreateOrderSerializer(serializers.Serializer):
             # delete cart id
             Cart.objects.filter(pk=cart_id).delete()
             
+            # fire a signal that an order has been created
+            order_created.send_robust(sender=self.__class__, order=order)
+
             return order
