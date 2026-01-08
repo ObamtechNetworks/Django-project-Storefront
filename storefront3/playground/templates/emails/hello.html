@@ -1,0 +1,12 @@
+{% block subject %}This is a long subject line{% endblock %}
+
+{% comment %} {%block text_body%}
+Hello, this is a test email.
+{% endblock %} {% endcomment %}
+
+{% block html_body %}
+    <h1>Hello!</h1>
+    <p>This is a test email with <strong>HTML</strong> content.</p>
+    <p>By the way my name is {{ name }}.</p>
+    <img src="cid:dog.png" alt="Dog Image">
+{% endblock %}
