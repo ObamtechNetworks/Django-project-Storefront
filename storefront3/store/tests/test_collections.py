@@ -5,6 +5,7 @@ import pytest
 
 @pytest.mark.django_db
 class TestCreateCollection:
+    # @pytest.mark.skip(reason="demonstration of test structure") # This decorator can be used to skip a test
     def test_if_user_is_anonymous_returns_401(self):
         # Every test should have three parts - the triple AAA
         
