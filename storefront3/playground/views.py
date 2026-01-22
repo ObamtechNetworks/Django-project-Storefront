@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
-from templated_mail.mail import BaseEmailMessage
+from templated_mail.mail import BaseEmailMessage # this class extends Django's EmailMessage
 
 
 def say_hello(request):
@@ -17,8 +17,8 @@ def say_hello(request):
         # message.attach_file('playground/static/images/dog.png')
         # message.send()
         message = BaseEmailMessage(
-            template_name='emails/hello.html',
-            context={'name': 'Bamidele Michael'}
+            template_name='emails/hello.html', # specify the email template file to be used
+            context={'name': 'Bamidele Michael'} # dynamic context data for rendering the template
         )
         message.send(to=['obams@example.com'])
     except BadHeaderError:
