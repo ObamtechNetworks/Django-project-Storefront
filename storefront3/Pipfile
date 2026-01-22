@@ -19,9 +19,12 @@ django-templated-mail = "*"
 redis = "*"
 celery = "*"
 flower = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 autopep8 = "*"
+pytest = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.9"

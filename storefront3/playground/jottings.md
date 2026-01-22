@@ -61,3 +61,38 @@ In our lesson we'd use Redis as a message broker and as a cache.
 Sometimes we want to schedule messages or tasks towards specific period of times instead of sending the tasks immediately, this is where Celery Beat comes into play
 
 Celery Beat is a process that acts as a manager or work orchestrator
+
+
+===
+
+# AUTOMATED TESTING
+Automated Testing is an essential practice in software engineering which helps to build efficient applications, however, while it is a great feat and skill, it can be like a two-edge sword that can get one frustrated when done wrongly.
+
+# The Proper way to Automated Testing
+- Test Behaviours not Implementation
+Because implemenations may change so the test is to focus on how the API behaves not how it is implemented.
+
+E.g An API to create a Collection
+POST /collections
+So we are meant to test the behaviour of the API
+e.g Anonymous trying to access the endpoint to create a collection should return a 401 response
+Non-Admin -> 403
+Admin && invalid data -> 400
+Admin && valid data -> 200
+
+So this is how the collection API should behave when creating a collection.
+
+So one more time **Test the behaviours not the implementation**
+
+## TEST FRAMEWORKS FOR PYTHON APPLICATION
+- Unittest
+- Pytest
+
+We would be using pytest because of:
+- More features and less boilerplate
+
+So we will install pytest as a development dependencies
+pipenv install --dev pytest
+
+- Also we install pytest plugins for django
+pipenv install --dev pytest-django
