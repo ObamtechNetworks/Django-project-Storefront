@@ -203,3 +203,6 @@ CELERY_BEAT_SCHEDULE = {
         'args': ("Hello customers! This is a periodic notification sent to all our customers.",), # a list can also use
     }
 }
+
+if not DEBUG:
+    INSTALLED_APPS.remove('debug_toolbar')
