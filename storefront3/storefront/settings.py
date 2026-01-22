@@ -189,3 +189,5 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 ADMINS = [
     ('Obams', 'obams@example.com'),
 ]
+
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
