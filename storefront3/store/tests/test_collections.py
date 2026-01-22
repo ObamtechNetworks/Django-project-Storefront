@@ -1,4 +1,5 @@
 # organize the tests by usecases
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient # This is a test client for DRF
 import pytest
@@ -28,3 +29,26 @@ class TestCreateCollection:
         
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN # Check that the response status code is 403 Forbidden
+    
+    def test_if_data_is_invalid_returns_400(self):
+        # Arrange
+        # Act
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True)) # Simulate an authenticated admin user
+        response = client.post('/store/collections/', {'title': ''}) # Send invalid data (empty title)
+        
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST # Check that the response status code is 400 Bad Request
+        # Optionally, we can also check the error message in the response
+        assert response.data['title'] is not None
+        
+    def test_if_data_is_valid_returns_201(self):
+        # Arrange
+        # Act
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True)) # Simulate an authenticated admin user
+        response = client.post('/store/collections/', {'title': 'a'}) # Send valid data
+        
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED # Check that the response status code is 201 Created
+        assert response.data['id'] > 0 # Check that the response contains a valid collection ID
