@@ -55,3 +55,9 @@ There are different kinds of Message brokers out there, but the two main brokers
 - RabbitMQ (is a real, entrprise-grade broker, has so many features that Redis don't have, but then it comes with a cost).
 
 In our lesson we'd use Redis as a message broker and as a cache.
+
+
+# CELERY BEAT
+Sometimes we want to schedule messages or tasks towards specific period of times instead of sending the tasks immediately, this is where Celery Beat comes into play
+
+Celery Beat is a process that acts as a manager or work orchestrator

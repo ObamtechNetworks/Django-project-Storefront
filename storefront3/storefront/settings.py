@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -191,3 +192,12 @@ ADMINS = [
 ]
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
+
+CELERY_BEAT_SCHEDULE = {
+    'notify_customers': {
+        'task': 'playground.tasks.notify_customers',
+        'schedule': timedelta(seconds=5), # we can use crontab to schedule tasks more flexibly
+        # 'schedule': crontab(second='*/1'),  # every 1 minute
+        'args': ("Hello customers! This is a periodic notification sent to all our customers.",), # a list can also use
+    }
+}
