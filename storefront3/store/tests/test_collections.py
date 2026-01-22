@@ -18,3 +18,13 @@ class TestCreateCollection:
         
         # Assert -> where we verify the behavior we expected
         assert response.status_code == status.HTTP_401_UNAUTHORIZED # Check that the response status code is 401 Unauthorized
+        
+    def test_if_user_is_not_admin_returns_403(self):
+        # Arrange
+        # Act
+        client = APIClient()
+        client.force_authenticate(user={}) # Simulate an authenticated user who is not an admin
+        response = client.post('/store/collections/', {'title': 'a'})
+        
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN # Check that the response status code is 403 Forbidden
