@@ -87,15 +87,15 @@ class TestRetrieveCollection:
             'title': collection.title,
             'products_count': 0  # Assuming no products are associated with the collection
         }
-        def test_if_collection_does_not_exist_returns_404(self, api_client):
-            # Arrange
-            # No collection is created
-            
-            # Act
-            response = api_client.get('/store/collections/99999/')
-            
-            # Assert
-            assert response.status_code == status.HTTP_404_NOT_FOUND
+    def test_if_collection_does_not_exist_returns_404(self, api_client):
+        # Arrange
+        # No collection is created
+        
+        # Act
+        response = api_client.get('/store/collections/99999/')
+        
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.django_db
     class TestUpdateCollection:
