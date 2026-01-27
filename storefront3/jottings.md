@@ -96,3 +96,61 @@ pipenv install --dev pytest
 
 - Also we install pytest plugins for django
 pipenv install --dev pytest-django
+
+--
+
+# PERFROMANCE TESTING
+- Learnt about performance testing in Django, understood how to test for performance / load using the locust package.
+- Installed locust pacakage to facilitate performance test simulations => pipenv install --dev locust
+- Learnt how to setup the locaust directories to handle facilitate the testing.
+- Learnt how to create test scripts for performance testing with locust
+- Learnt how to run test scripts in the locustfiles directory with access to the UI interface =>  locust -f locustfiles/browse_products.py
+- Learnt how to simulate user tests and loads on the locust UI: test with 500 users, 10 user per ramping, etc
+- Learnt how to analyze the different metrics from the test results -> request time, response time, latency, plateau, failures etc
+
+
+# PERFORMANCE OPTIMIZATION TECHNIQUES
+Most of the times,the performance issues is either in the query or the database
+
+# **Optimization Techniques**
+## Optimizate the code (Code optimization options)
+- *Preload related objects*
+Products.objects.select_related('...')
+Product.objects.prefetch_related('...')
+
+- *Load only only you need*
+Product.objects.only('title')
+Product.objects.defer('description')
+
+- *Use Values*
+Product.objects.values() # returns a dictionary 
+Product.objects.values_list() # returns a list
+
+- *Count properly*
+Product.objects.count()
+len(Product.objects.all())  # BAD
+
+- *Bulk Operations - Create/update*
+Product.objects.bulk_create([])
+
+### - Re-wreite the query
+### - Tune the database
+### - Caching the result
+### - Buy more hardware -> more servers
+
+---
+
+# PROFILING TOOL DJANGO-SILK
+- Learnt about Silk, a Django profiling tool, use to get the execution profile of our application, how a request gets executed, what queries amount to the request and can dig down other details.
+
+pipenv install --dev django-silk
+Django Silk package URL -> https://github.com/jazzband/django-silk
+
+Use Silk only in development or testing
+Because silk will intercepts our requests, takes some information for itself and then processes it
+if DEBUG:
+    MIDDLEWARE += [
+        'silk.middleware.SilkyMiddleware',
+    ]
+
+Silk is accessed at /silk
