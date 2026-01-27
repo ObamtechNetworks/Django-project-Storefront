@@ -1,7 +1,10 @@
 from django.shortcuts import render
+from django.core.cache import cache
+From
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from templated_mail.mail import BaseEmailMessage # this class extends Django's EmailMessage
 from .tasks import notify_customers
+import requests
 
 def say_hello(request):
     # try:
@@ -25,6 +28,14 @@ def say_hello(request):
     #     pass
     
     # ===> CELERY SECTION HERE
-    notify_customers.delay("This is important notification for all our customers!")
+    # notify_customers.delay("This is important notification for all our customers!")
     
-    return render(request, 'hello.html', {'name': 'Bamidele'})
+    # return render(request, 'hello.html', {'name': 'Bamidele'})
+    
+    # SIMULATING A SLOW API
+    key = 'httpbin_result'
+    if cache.get(key) is None:
+        response = requests.get('https://httpbin.org/delay/2') # Simulates a 2-second delay
+        data = response.json()
+        cache.set(key, data)
+    return render(request, 'hello.html', {'name': cache.get(key)})

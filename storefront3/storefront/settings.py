@@ -212,3 +212,14 @@ CELERY_BEAT_SCHEDULE = {
 
 if not DEBUG:
     INSTALLED_APPS.remove('debug_toolbar')
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/2",
+        "TIMEOUT": 10 * 60,  # 10 minutes,  # 10 minutes
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}

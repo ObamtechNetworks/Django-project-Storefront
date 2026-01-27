@@ -154,3 +154,24 @@ if DEBUG:
     ]
 
 Silk is accessed at /silk
+
+
+# CACHING
+Caching is a an optimization technique used to improve system performance.
+Instead of constantly retrieving data from the database per every request of the same item, we can cache the data in memory and subsequent requests care retrieved from the memory which actually improves response time and frees up the system to accomodate more requests.
+
+## Dangers of Caching
+Because data are stored in memory, if we have data on the database being updated, the previouly cached data becomes staled and does not correspond to the latest on the database, so this way, the data in memory might not have the latest updated data on the DB, unless being re-retrieved
+
+So Caching may not be recommended for processes that data is frequently updated.
+
+Caching is not limited to the result of database queries, we can also use caching with 3rd-party APIs.
+
+Caching is great but this does not mean we should cache everything in our system. Because too much of a good thing is a bad thing and premature optimization is the root of all evil - Donald Knuth.
+
+# Types of Cache Backend / Engine
+- Local memory (default) -> good for development but not for production grade
+- Memcached -> Good for production
+- Redis -> Good for production
+- Database as a Cache
+- File System as a Cache
