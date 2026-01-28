@@ -284,11 +284,12 @@ class TestUpdateProduct:
     def test_if_data_is_valid_returns_200(self, api_client, authenticate_user, create_product):
         # Arrange
         authenticate_user(is_staff=True)
-        product = baker.make(Product)
+        product = baker.make(Product, inventory=50, description='Original Description', unit_price=20.00)
+        print(f'Baker made product: {product}')
         update_data = {
             'title': 'Updated Title',
-            'description': str(product.description),
-            'unit_price': str(product.unit_price),
+            'description': (product.description),
+            'unit_price': (product.unit_price),
             'inventory': product.inventory,
             'slug': product.slug,
             'collection': product.collection.id
@@ -296,6 +297,7 @@ class TestUpdateProduct:
         
         # Act
         response = api_client.put(f'/store/products/{product.id}/', update_data)
+        print(f'response.data: {response.data}')
         
         # Assert
         assert response.status_code == status.HTTP_200_OK
