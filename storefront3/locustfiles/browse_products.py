@@ -40,7 +40,7 @@ class WebsiteUser(HttpUser):
         result = response.json()
         self.cart_id = result["id"]
     
-    @task
-    def say_hello(self):
-        print("Hello, welcome to the store!")
-        self.client.get("/playground/hello/")
+    # @task
+    # def say_hello(self):
+    #     print("Hello, welcome to the store!")
+    #     self.client.get("/playground/hello/")

@@ -1,6 +1,8 @@
 from store.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly, ViewCustomerHistoryPermission
 from store.pagination import DefaultPagination
 from django.db.models.aggregates import Count
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, permission_classes
@@ -14,7 +16,9 @@ from .filters import ProductFilter
 from .models import Cart, CartItem, Collection, Customer, Order, OrderItem, Product, Review, ProductImage
 from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CollectionSerializer, CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, ReviewSerializer, UpdateCartItemSerializer, UpdateOrderSerializer, ProductImageSerializer
 
-
+# let's cache the product list and detail views for 15 minutes
+@method_decorator(cache_page(60*15), name='list')
+@method_decorator(cache_page(60*15), name='retrieve')
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related('images').all()
     serializer_class = ProductSerializer
