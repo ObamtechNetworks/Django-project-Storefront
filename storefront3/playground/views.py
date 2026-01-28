@@ -6,14 +6,22 @@ from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessag
 from templated_mail.mail import BaseEmailMessage # this class extends Django's EmailMessage
 from .tasks import notify_customers
 from rest_framework.views import APIView
+import logging
 import requests
 
+logger = logging.getLogger(__name__) # translates to playground.views (name of current module)
+
 class HelloView(APIView):
-    @method_decorator(cache_page(60*5))  # Cache the view for 5 minutes, this is how to decorate class-based views
+    # @method_decorator(cache_page(60*5))  # Cache the view for 5 minutes, this is how to decorate class-based views
     def get(self, request):
-        # SIMULATING A SLOW API with caching eliminating the low-level cache implementation
-        response = requests.get('https://httpbin.org/delay/2')  # Simulates a 2-second delay
-        data = response.json()
+        try:
+            logger.info("Calling httpbin")
+            # SIMULATING A SLOW API with caching eliminating the low-level cache implementation
+            response = requests.get('https://httpbin.org/delay/2')  # Simulates a 2-second delay
+            logger.info("Received the response from httpbin")
+            data = response.json()
+        except requests.ConnectionError:
+            logger.critical("httpbin is offline")
         return render(request, 'hello.html', {'name': 'Bamidele'})
 
 """
