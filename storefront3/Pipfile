@@ -21,6 +21,7 @@ celery = "*"
 flower = "*"
 drf-spectacular = "*"
 django-redis = "*"
+whitenoise = "*"
 
 [dev-packages]
 autopep8 = "*"
