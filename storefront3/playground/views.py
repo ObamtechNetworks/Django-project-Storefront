@@ -1,11 +1,23 @@
 from django.shortcuts import render
 from django.core.cache import cache
-From
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from templated_mail.mail import BaseEmailMessage # this class extends Django's EmailMessage
 from .tasks import notify_customers
+from rest_framework.views import APIView
 import requests
 
+class HelloView(APIView):
+    @method_decorator(cache_page(60*5))  # Cache the view for 5 minutes, this is how to decorate class-based views
+    def get(self, request):
+        # SIMULATING A SLOW API with caching eliminating the low-level cache implementation
+        response = requests.get('https://httpbin.org/delay/2')  # Simulates a 2-second delay
+        data = response.json()
+        return render(request, 'hello.html', {'name': 'Bamidele'})
+
+"""
+@cache_page(60*5)  # Cache the view for 5 minutes, this works for a function-based view
 def say_hello(request):
     # try:
     #     # send_mail('subject', 'message', 'webmaster@localhost', ['user@example.com'])
@@ -32,10 +44,8 @@ def say_hello(request):
     
     # return render(request, 'hello.html', {'name': 'Bamidele'})
     
-    # SIMULATING A SLOW API
-    key = 'httpbin_result'
-    if cache.get(key) is None:
-        response = requests.get('https://httpbin.org/delay/2') # Simulates a 2-second delay
-        data = response.json()
-        cache.set(key, data)
-    return render(request, 'hello.html', {'name': cache.get(key)})
+    # SIMULATING A SLOW API with caching eliminating the low-level cache implementation
+    response = requests.get('https://httpbin.org/delay/2')  # Simulates a 2-second delay
+    data = response.json()
+    return render(request, 'hello.html', {'name': data})
+"""
