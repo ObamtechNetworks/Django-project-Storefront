@@ -25,3 +25,4 @@ social-auth-app-django==5.4.3
 # Utils
 python-dotenv==1.2.1
 pillow==11.3.0
+django-templated-mail==1.1.1
