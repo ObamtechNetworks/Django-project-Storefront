@@ -36,14 +36,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third-party
     'django_filters',
     'corsheaders',
     'rest_framework',
     'drf_spectacular',
     'djoser',
-    'silk',
+
+    # Your apps
     'playground',
-    'debug_toolbar',
     'store',
     'tags',
     'likes',
@@ -52,7 +54,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,21 +64,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# if DEBUG:
-#     MIDDLEWARE += [
-#         'silk.middleware.SilkyMiddleware',
-#     ]
-
 INTERNAL_IPS = [
     # ...
     '127.0.0.1',
     # ...
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8001',
-    'http://127.0.0.1:8001',
-]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'storefront.urls'
 
@@ -184,7 +177,9 @@ ADMINS = [
     ('Obams', 'obams@example.com'),
 ]
 
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 
 CELERY_BEAT_SCHEDULE = {
     'notify_customers': {
