@@ -40,3 +40,18 @@ else:
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
+    
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend",  # Change this for production
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.sendgrid.net")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "apikey")  # Literally the word "apikey"
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")  # Your SendGrid API key
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = True  # Add this
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@drbamsstorefront.onrender.com")
+
+ADMINS = [
+    ('Obams', 'obamtechnetworks@gmail.com'),
+]

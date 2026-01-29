@@ -168,35 +168,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
 }
 
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend",
-)
-EMAIL_HOST = os.getenv("EMAIL_HOST", "")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
-ADMINS = [
-    ('Obams', 'obams@example.com'),
-]
-
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "TIMEOUT": 10 * 60,  # 10 minutes
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
 
 CELERY_BEAT_SCHEDULE = {
     'notify_customers': {
